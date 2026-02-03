@@ -4,6 +4,7 @@ using BooksReviews.Application.Features.Reviews.DTOs;
 using BooksReviews.Application.Features.Reviews.Queries.GetReviewsByBookId;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BooksReviews.Api.Controllers;
 
@@ -27,6 +28,7 @@ public class ReviewsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<string>> Create(CreateReviewCommand command)
     {
         var result = await _mediator.Send(command);
@@ -34,6 +36,7 @@ public class ReviewsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult> Delete(string id)
     {
         var command = new DeleteReviewCommand(id);

@@ -30,13 +30,11 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<boolean> {
     try {
-      // In this demo, "login" is just finding the user by email
-      const users = await lastValueFrom(this.http.get<User[]>(this.apiUrl));
-      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const result = await lastValueFrom(this.http.post<User>(`${this.apiUrl}/login`, { email, password }));
 
-      if (user) {
-        this._currentUser.set(user);
-        localStorage.setItem('bookworm_user', JSON.stringify(user));
+      if (result) {
+        this._currentUser.set(result);
+        localStorage.setItem('bookworm_user', JSON.stringify(result));
         return true;
       }
     } catch (error) {
@@ -48,18 +46,19 @@ export class AuthService {
   async register(name: string, email: string, password: string): Promise<boolean> {
     if (!email || !name) return false;
 
-    const newUser: User = {
+    const registerData = {
       id: 'u-' + Math.floor(Math.random() * 10000).toString(),
       name: name,
       email: email,
+      password: password,
       avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`
     };
 
     try {
-      await lastValueFrom(this.http.post(this.apiUrl, newUser));
-      this._currentUser.set(newUser);
-      localStorage.setItem('bookworm_user', JSON.stringify(newUser));
-      return true;
+      await lastValueFrom(this.http.post(this.apiUrl, registerData));
+      // After registration, we could automatically log in or ask user to log in.
+      // For now, let's try to login automatically
+      return await this.login(email, password);
     } catch (error) {
       console.error('Registration failed:', error);
       return false;

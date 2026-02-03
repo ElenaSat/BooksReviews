@@ -1,6 +1,7 @@
 using BooksReviews.Application.Features.Users.Commands.CreateUser;
 using BooksReviews.Application.Features.Users.Commands.DeleteUser;
 using BooksReviews.Application.Features.Users.Commands.UpdateUser;
+using BooksReviews.Application.Features.Users.Commands.Login;
 using BooksReviews.Application.Features.Users.DTOs;
 using BooksReviews.Application.Features.Users.Queries.GetUserById;
 using BooksReviews.Application.Features.Users.Queries.GetUsers;
@@ -42,6 +43,14 @@ public class UsersController : ControllerBase
     {
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = result }, result);
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResponse>> Login(LoginCommand command)
+    {
+        var result = await _mediator.Send(command);
+        if (result == null) return Unauthorized();
+        return Ok(result);
     }
 
     [HttpPut("{id}")]

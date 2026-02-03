@@ -19,6 +19,9 @@ public class User
     public string Email { get; set; } = string.Empty;
 
     public string AvatarUrl { get; set; } = string.Empty;
+    [Required]
+    [StringLength(255)]
+    public string PasswordHash { get; set; } = string.Empty;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
