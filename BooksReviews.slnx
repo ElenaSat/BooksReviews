@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BooksReviews.Api/BooksReviews.Api.csproj" Id="ba1188d3-904b-43ce-8975-2b72dcbd705e" />
+  <Project Path="BooksReviews.Application/BooksReviews.Application.csproj" />
+  <Project Path="BooksReviews.Domain/BooksReviews.Domain.csproj" />
+  <Project Path="BooksReviews.Infrastructure/BooksReviews.Infrastructure.csproj" />
+</Solution>
