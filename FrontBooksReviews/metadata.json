@@ -1,0 +1,5 @@
+{
+  "name": "BooksReviews",
+  "description": "Una plataforma completa de reseñas de libros que permite a los usuarios navegar, buscar y reseñar libros con una arquitectura backend simulada de .NET CQRS.",
+  "requestFramePermissions": []
+}
