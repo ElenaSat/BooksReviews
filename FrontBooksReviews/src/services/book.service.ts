@@ -66,15 +66,19 @@ export class BookService {
   // "CQRS Command": Add a review
   async addReview(bookId: string, userId: string, userName: string, rating: number, comment: string) {
     const command = {
-      bookId,
-      userId,
-      rating,
-      comment
+      id: 'r-' + Math.floor(Math.random() * 10000).toString(),
+      bookId:bookId,
+      userId:userId,
+      userName: userName,
+      rating:rating,
+      comment:comment
     };
 
     try {
-      await lastValueFrom(this.http.post(`${this.apiUrl}/Reviews`, command));
-
+      await lastValueFrom(this.http.post(`${this.apiUrl}/Reviews`, command,{
+        responseType: 'text'  
+      }));
+      
       // Refresh reviews and book rating
       await this.loadReviewsForBook(bookId);
       await this.loadBooks();

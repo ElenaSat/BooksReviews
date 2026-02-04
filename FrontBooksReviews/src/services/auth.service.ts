@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async register(name: string, email: string, password: string): Promise<boolean> {
-    if (!email || !name) return false;
+    if (!email || !name || !password) return false;
 
     const registerData = {
       id: 'u-' + Math.floor(Math.random() * 10000).toString(),
@@ -54,13 +54,15 @@ export class AuthService {
       avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`
     };
 
-    try {
-      await lastValueFrom(this.http.post(this.apiUrl, registerData));
+   try {
+          await lastValueFrom(this.http.post(this.apiUrl, registerData,{
+        responseType: 'text'  
+      }));
       return true;
     } catch (error) {
       console.error('Registration failed:', error);
-      return false;
-    }
+    return false;
+  }
   }
 
   logout() {
