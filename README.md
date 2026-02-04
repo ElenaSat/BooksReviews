@@ -77,7 +77,6 @@ dotnet test
 - Las clases de autenticación están en [BooksReviews.Infrastructure/Authentication](BooksReviews.Infrastructure/Authentication).
 - Para producción, ajuste `JwtSettings` y la cadena de conexión (secretos en variables de entorno o un vault).
 
-Si quieres, aplico un commit con este `README.md`, añado instrucciones de Docker o genero un pequeño script de inicio para desarrollo.
 
 **Ejecución con Docker (desarrollo local)**
 
@@ -126,5 +125,3 @@ az webapp create -g BooksReviewsRG -p BooksReviewsPlan -n booksreviews-api --dep
 - Nunca guardes secretos en `appsettings.json` en el repositorio; usa variables de entorno o un vault.
 - Cambia la contraseña `sa` y `JwtSettings__Secret` antes de producción.
 - Considera usar una base de datos gestionada (Azure SQL, RDS) y un CDN/host estático para el frontend.
-
-Si quieres, hago el commit de los Dockerfiles y el `docker-compose.yml` ahora y configuro un workflow básico de GitHub Actions para construcción y push de imágenes.
