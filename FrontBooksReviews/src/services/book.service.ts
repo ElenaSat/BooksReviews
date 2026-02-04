@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Book, Review } from '../models/models';
 import { lastValueFrom } from 'rxjs';
@@ -8,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class BookService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7151/api';
+  private apiUrl = environment.apiBaseUrl;
 
   // State managed by signals
   private _books = signal<Book[]>([]);

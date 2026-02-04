@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
+import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../models/models';
 import { lastValueFrom } from 'rxjs';
@@ -8,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:7151/api/Users';
+  private apiUrl = environment.apiBaseUrl + '/Users';
 
   // Signal to hold the current authenticated user
   private _currentUser = signal<User | null>(null);
