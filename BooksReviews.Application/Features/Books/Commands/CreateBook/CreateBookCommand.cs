@@ -1,6 +1,8 @@
 using MediatR;
 using BooksReviews.Application.Common.Interfaces;
 using BooksReviews.Domain.Entities;
+using BooksReviews.Application.Common.Models;
+using AutoMapper;
 
 namespace BooksReviews.Application.Features.Books.Commands.CreateBook;
 
@@ -10,31 +12,25 @@ public record CreateBookCommand(
     string Author,
     string Category,
     string Description,
-    string CoverUrl) : IRequest<string>;
+    string CoverUrl) : IRequest<Result<string>>;
 
-public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, string>
+public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Result<string>>
 {
     private readonly IBookRepository _bookRepository;
+    private readonly IMapper _mapper;
 
-    public CreateBookCommandHandler(IBookRepository bookRepository)
+    public CreateBookCommandHandler(IBookRepository bookRepository, IMapper mapper)
     {
         _bookRepository = bookRepository;
+        _mapper = mapper;
     }
 
-    public async Task<string> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
     {
-        var book = new Book
-        {
-            Id = request.Id,
-            Title = request.Title,
-            Author = request.Author,
-            Category = request.Category,
-            Description = request.Description,
-            CoverUrl = request.CoverUrl
-        };
+        var book = _mapper.Map<Book>(request);
 
         await _bookRepository.AddAsync(book);
 
-        return book.Id;
+        return Result<string>.Success(book.Id);
     }
 }

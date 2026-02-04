@@ -13,6 +13,9 @@ export class BookService {
   // State managed by signals
   private _books = signal<Book[]>([]);
   private _reviews = signal<Review[]>([]);
+  private _error = signal<string | null>(null);
+
+  error = this._error.asReadonly();
 
   constructor() {
     this.loadBooks();
@@ -21,10 +24,12 @@ export class BookService {
   // Load all books from API
   async loadBooks() {
     try {
+      this._error.set(null);
       const books = await lastValueFrom(this.http.get<Book[]>(`${this.apiUrl}/Books`));
       this._books.set(books);
     } catch (error) {
       console.error('Error loading books:', error);
+      this._error.set('No se pudieron cargar los libros. Revisa tu conexión.');
     }
   }
 

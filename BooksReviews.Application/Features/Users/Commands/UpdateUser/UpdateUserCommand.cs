@@ -1,5 +1,6 @@
 using MediatR;
 using BooksReviews.Application.Common.Interfaces;
+using BooksReviews.Application.Common.Models;
 
 namespace BooksReviews.Application.Features.Users.Commands.UpdateUser;
 
@@ -7,9 +8,9 @@ public record UpdateUserCommand(
     string Id,
     string Name,
     string Email,
-    string AvatarUrl) : IRequest<Unit>;
+    string AvatarUrl) : IRequest<Result>;
 
-public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
+public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Result>
 {
     private readonly IUserRepository _userRepository;
 
@@ -18,11 +19,12 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
         _userRepository = userRepository;
     }
 
-    public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(request.Id);
 
-        if (user == null) return Unit.Value;
+        if (user == null) 
+            return Result.Failure("Not Found");
 
         user.Name = request.Name;
         user.Email = request.Email;
@@ -30,6 +32,6 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Unit>
 
         await _userRepository.UpdateAsync(user);
 
-        return Unit.Value;
+        return Result.Success();
     }
 }

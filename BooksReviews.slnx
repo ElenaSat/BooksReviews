@@ -3,4 +3,5 @@
   <Project Path="BooksReviews.Application/BooksReviews.Application.csproj" />
   <Project Path="BooksReviews.Domain/BooksReviews.Domain.csproj" />
   <Project Path="BooksReviews.Infrastructure/BooksReviews.Infrastructure.csproj" />
+  <Project Path="BooksReviews.UnitTests/BooksReviews.UnitTests.csproj" />
 </Solution>

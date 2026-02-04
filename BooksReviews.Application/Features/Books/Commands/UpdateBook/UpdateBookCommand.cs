@@ -1,6 +1,6 @@
 using MediatR;
 using BooksReviews.Application.Common.Interfaces;
-using BooksReviews.Domain.Entities;
+using BooksReviews.Application.Common.Models;
 
 namespace BooksReviews.Application.Features.Books.Commands.UpdateBook;
 
@@ -10,9 +10,9 @@ public record UpdateBookCommand(
     string Author,
     string Category,
     string Description,
-    string CoverUrl) : IRequest<Unit>;
+    string CoverUrl) : IRequest<Result>;
 
-public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Unit>
+public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Result>
 {
     private readonly IBookRepository _bookRepository;
 
@@ -21,11 +21,12 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Unit>
         _bookRepository = bookRepository;
     }
 
-    public async Task<Unit> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
     {
         var book = await _bookRepository.GetByIdAsync(request.Id);
         
-        if (book == null) return Unit.Value;
+        if (book == null) 
+            return Result.Failure("Not Found");
 
         book.Title = request.Title;
         book.Author = request.Author;
@@ -35,6 +36,6 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Unit>
 
         await _bookRepository.UpdateAsync(book);
 
-        return Unit.Value;
+        return Result.Success();
     }
 }

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -37,7 +38,7 @@ import { AuthService } from '../../services/auth.service';
         </button>
 
         @if (error) {
-          <div class="p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+          <div class="p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center border border-red-100 animate-shake">
             {{ error }}
           </div>
         }
@@ -47,7 +48,18 @@ import { AuthService } from '../../services/auth.service';
         </div>
       </form>
     </div>
-  `
+  `,
+  styles: [`
+    .animate-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+  `]
 })
 export class LoginComponent {
   fb = inject(FormBuilder);
@@ -62,12 +74,27 @@ export class LoginComponent {
 
   async onSubmit() {
     if (this.loginForm.valid) {
+      this.error = '';
       const { email, password } = this.loginForm.value;
-      const success = await this.authService.login(email!, password!);
-      if (success) {
-        this.router.navigate(['/']);
-      } else {
-        this.error = 'Credenciales inválidas';
+      try {
+        const success = await this.authService.login(email!, password!);
+        if (success) {
+          this.router.navigate(['/']);
+        } else {
+          this.error = 'Credenciales inválidas';
+        }
+      } catch (err) {
+        if (err instanceof HttpErrorResponse) {
+          if (err.status === 401) {
+            this.error = 'Correo o contraseña incorrectos.';
+          } else if (err.status === 0) {
+            this.error = 'No se pudo conectar con el servidor. Revisa tu conexión.';
+          } else {
+            this.error = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
+          }
+        } else {
+          this.error = 'Ocurrió un error desconocido.';
+        }
       }
     }
   }

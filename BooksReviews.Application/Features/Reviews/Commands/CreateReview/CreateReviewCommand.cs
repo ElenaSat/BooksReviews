@@ -1,5 +1,6 @@
 using MediatR;
 using BooksReviews.Application.Common.Interfaces;
+using BooksReviews.Application.Common.Models;
 using BooksReviews.Domain.Entities;
 
 namespace BooksReviews.Application.Features.Reviews.Commands.CreateReview;
@@ -10,9 +11,9 @@ public record CreateReviewCommand(
     string UserId,
     string UserName,
     double Rating,
-    string Comment) : IRequest<string>;
+    string Comment) : IRequest<Result<string>>;
 
-public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, string>
+public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, Result<string>>
 {
     private readonly IReviewRepository _reviewRepository;
 
@@ -21,7 +22,7 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, s
         _reviewRepository = reviewRepository;
     }
 
-    public async Task<string> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
     {
         var review = new Review
         {
@@ -36,6 +37,6 @@ public class CreateReviewCommandHandler : IRequestHandler<CreateReviewCommand, s
 
         await _reviewRepository.AddAsync(review);
 
-        return review.Id;
+        return Result<string>.Success(review.Id);
     }
 }

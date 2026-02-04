@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -89,6 +89,11 @@ import { Book, Review } from '../../models/models';
                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                  <h3 class="text-lg font-bold text-slate-800 mb-4">Escribir una Reseña</h3>
                  <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+                    @if (errorMessage()) {
+                      <div class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100">
+                         {{ errorMessage() }}
+                      </div>
+                    }
                    <div class="mb-4">
                      <label class="block text-sm font-medium text-slate-700 mb-1">Calificación</label>
                      <div class="flex gap-2">
@@ -193,10 +198,18 @@ export class BookDetailComponent {
     this.currentRating.set(rating);
   }
 
+  errorMessage = signal('');
+
   async submitReview() {
+    this.errorMessage.set('');
     if (this.reviewForm.valid && this.currentRating() > 0 && this.book()) {
       const user = this.authService.currentUser();
-      if (user) {
+      if (!user) {
+        this.errorMessage.set('Debes iniciar sesión para publicar una reseña.');
+        return;
+      }
+
+      try {
         await this.bookService.addReview(
           this.book()!.id,
           user.id,
@@ -213,6 +226,9 @@ export class BookDetailComponent {
         // Refresh local book to update average rating
         const updatedBook = this.bookService.getBookById(this.book()!.id);
         this.book.set(updatedBook);
+      } catch (err) {
+        console.error('Review submission failed:', err);
+        this.errorMessage.set('Error al publicar la reseña. Inténtalo de nuevo más tarde.');
       }
     }
   }

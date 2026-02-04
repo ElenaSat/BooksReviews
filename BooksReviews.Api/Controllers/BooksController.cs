@@ -11,52 +11,54 @@ namespace BooksReviews.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BooksController : ControllerBase
+public class BooksController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public BooksController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<BookDto>>> GetAll()
     {
-        var query = new GetBooksQuery();
-        var result = await _mediator.Send(query);
-        return Ok(result);
+        var result = await Mediator.Send(new GetBooksQuery());
+        return HandleResult(result);
     }
 
     [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BookDto>> GetById(string id)
     {
-        var query = new GetBookByIdQuery(id);
-        var result = await _mediator.Send(query);
-        if (result == null) return NotFound();
-        return Ok(result);
+        var result = await Mediator.Send(new GetBookByIdQuery(id));
+        return HandleResult(result);
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Create(CreateBookCommand command)
     {
-        var result = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { id = result }, result);
+        var result = await Mediator.Send(command);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+        
+        return BadRequest(new { message = result.Error });
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Update(string id, UpdateBookCommand command)
     {
-        if (id != command.Id) return BadRequest();
-        await _mediator.Send(command);
-        return NoContent();
+        if (id != command.Id) return BadRequest(new { message = "ID mismatch" });
+        var result = await Mediator.Send(command);
+        return HandleResult(result);
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(string id)
     {
         var command = new DeleteBookCommand(id);
-        await _mediator.Send(command);
+        await Mediator.Send(command);
         return NoContent();
     }
 }

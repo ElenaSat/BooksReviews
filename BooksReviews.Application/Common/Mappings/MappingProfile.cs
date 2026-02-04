@@ -11,6 +11,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<Book, BookDto>().ReverseMap();
+        CreateMap<Features.Books.Commands.CreateBook.CreateBookCommand, Book>();
         CreateMap<User, UserDto>().ReverseMap();
         CreateMap<Review, ReviewDto>().ReverseMap();
     }

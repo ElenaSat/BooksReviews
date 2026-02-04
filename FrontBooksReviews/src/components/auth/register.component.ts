@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,6 +15,18 @@ import { AuthService } from '../../services/auth.service';
         <h2 class="text-2xl font-bold text-slate-800">Crear Cuenta</h2>
         <p class="text-slate-500">Únete a la comunidad de amantes de los libros</p>
       </div>
+
+      @if (successMessage()) {
+        <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center font-medium animate-bounce">
+          {{ successMessage() }}
+        </div>
+      }
+
+      @if (error()) {
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-center font-medium">
+          {{ error() }}
+        </div>
+      }
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
         <div>
@@ -53,12 +66,34 @@ export class RegisterComponent {
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  successMessage = signal('');
+  error = signal('');
+
   async onSubmit() {
+    this.error.set('');
     if (this.registerForm.valid) {
       const { name, email, password } = this.registerForm.value;
-      const success = await this.authService.register(name!, email!, password!);
-      if (success) {
-        this.router.navigate(['/']);
+      try {
+        const success = await this.authService.register(name!, email!, password!);
+        if (success) {
+          this.successMessage.set('¡Cuenta creada satisfactoriamente! Redirigiendo al login...');
+          setTimeout(() => {
+            console.log('Navigating to login...');
+            this.router.navigateByUrl('/login');
+          }, 3000);
+        } else {
+          this.error.set('No se pudo crear la cuenta. Por favor verifica los datos.');
+        }
+      } catch (err) {
+        if (err instanceof HttpErrorResponse) {
+          if (err.status === 400) {
+            this.error.set('Los datos son inválidos o el correo ya está registrado.');
+          } else if (err.status === 0) {
+            this.error.set('No hay conexión con el servidor.');
+          } else {
+            this.error.set('Ocurrió un error al procesar el registro.');
+          }
+        }
       }
     }
   }

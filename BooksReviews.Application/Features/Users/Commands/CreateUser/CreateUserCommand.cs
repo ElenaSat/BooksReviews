@@ -1,5 +1,6 @@
 using MediatR;
 using BooksReviews.Application.Common.Interfaces;
+using BooksReviews.Application.Common.Models;
 using BooksReviews.Domain.Entities;
 
 namespace BooksReviews.Application.Features.Users.Commands.CreateUser;
@@ -9,9 +10,9 @@ public record CreateUserCommand(
     string Name,
     string Email,
     string AvatarUrl,
-    string Password) : IRequest<string>;
+    string Password) : IRequest<Result<string>>;
 
-public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, string>
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<string>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
@@ -22,7 +23,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, strin
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<string> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = new User
         {
@@ -35,6 +36,6 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, strin
 
         await _userRepository.AddAsync(user);
 
-        return user.Id;
+        return Result<string>.Success(user.Id);
     }
 }

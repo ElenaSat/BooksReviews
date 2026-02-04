@@ -10,6 +10,13 @@ import { BookService } from '../../services/book.service';
   imports: [CommonModule, RouterLink, FormsModule],
   template: `
     <div class="space-y-8">
+      @if (bookService.error()) {
+        <div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-center font-medium animate-pulse">
+          {{ bookService.error() }}
+          <button (click)="bookService.loadBooks()" class="ml-4 underline hover:text-red-900">Reintentar</button>
+        </div>
+      }
+
       <!-- Hero / Search Section -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
         <h1 class="text-3xl font-bold text-slate-800 mb-6">Descubre tu próximo libro favorito</h1>
@@ -97,11 +104,11 @@ import { BookService } from '../../services/book.service';
 })
 export class BookListComponent {
   bookService = inject(BookService);
-  
+
   // Signals for local UI state
   searchQuery = signal('');
   selectedCategory = signal('');
-  
+
   // Get books from service
   books = this.bookService.getBooks();
 
@@ -116,7 +123,7 @@ export class BookListComponent {
   filteredBooks = computed(() => {
     const q = this.searchQuery().toLowerCase();
     const c = this.selectedCategory();
-    
+
     return this.books().filter(book => {
       const matchesSearch = book.title.toLowerCase().includes(q) || book.author.toLowerCase().includes(q);
       const matchesCategory = c ? book.category === c : true;

@@ -56,9 +56,7 @@ export class AuthService {
 
     try {
       await lastValueFrom(this.http.post(this.apiUrl, registerData));
-      // After registration, we could automatically log in or ask user to log in.
-      // For now, let's try to login automatically
-      return await this.login(email, password);
+      return true;
     } catch (error) {
       console.error('Registration failed:', error);
       return false;

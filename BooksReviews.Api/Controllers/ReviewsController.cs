@@ -10,37 +10,38 @@ namespace BooksReviews.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ReviewsController : ControllerBase
+public class ReviewsController : ApiControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public ReviewsController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpGet("book/{bookId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<ReviewDto>>> GetByBookId(string bookId)
     {
-        var query = new GetReviewsByBookIdQuery(bookId);
-        var result = await _mediator.Send(query);
-        return Ok(result);
+        var result = await Mediator.Send(new GetReviewsByBookIdQuery(bookId));
+        return HandleResult(result);
     }
 
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Create(CreateReviewCommand command)
     {
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        var result = await Mediator.Send(command);
+        if (result.IsSuccess)
+            return CreatedAtAction(nameof(GetByBookId), new { bookId = command.BookId }, result.Value);
+        
+        return BadRequest(new { message = result.Error });
     }
 
     [HttpDelete("{id}")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(string id)
     {
-        var command = new DeleteReviewCommand(id);
-        await _mediator.Send(command);
-        return NoContent();
+        var result = await Mediator.Send(new DeleteReviewCommand(id));
+        return HandleResult(result);
     }
 }
