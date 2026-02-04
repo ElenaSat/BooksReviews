@@ -125,3 +125,17 @@ az webapp create -g BooksReviewsRG -p BooksReviewsPlan -n booksreviews-api --dep
 - Nunca guardes secretos en `appsettings.json` en el repositorio; usa variables de entorno o un vault.
 - Cambia la contraseña `sa` y `JwtSettings__Secret` antes de producción.
 - Considera usar una base de datos gestionada (Azure SQL, RDS) y un CDN/host estático para el frontend.
+
+**Variables de entorno / App Settings recomendadas**
+
+Cuando despliegues la imagen en Azure App Service (o en contenedores en cualquier host), configura las siguientes "Application Settings" / variables de entorno para que la API pueda conectarse a la base de datos y validar JWT:
+
+- `ConnectionStrings__DefaultConnection`: Connection string completa para SQL Server. Ejemplo:
+
+	Server=tcp:<DB_HOST>,1433;Initial Catalog=BooksReviewsDb;User Id=<DB_USER>;Password=<DB_PASSWORD>;TrustServerCertificate=True;MultipleActiveResultSets=True
+
+- `JwtSettings__Secret`: secreto fuerte para firmar los JWT (no poner en repositorio).
+- `JwtSettings__Issuer`: `BooksReviewsApi` (o tu valor).
+- `JwtSettings__Audience`: `BooksReviewsApp` (o tu valor).
+
+En Azure App Service: `Configuration` → `Application settings` → añadir las claves anteriores. Para Azure Web App con contenedor, esto asegura que la app lea la configuración desde el entorno en tiempo de ejecución.
