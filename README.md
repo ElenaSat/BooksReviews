@@ -42,37 +42,51 @@ Aplicación para reseñas de libros que permite a usuarios registrarse, iniciar 
 - [FrontBooksReviews](FrontBooksReviews): Frontend Angular 21 (scripts en `package.json`).
 - [BooksReviews.UnitTests](BooksReviews.UnitTests): Suite de pruebas unitarias.
 
-**Cómo ejecutar (desarrollo local):**
 
-1) API (Backend)
+## Despliegue local con Docker
 
-```bash
-cd BooksReviews.Api
-dotnet restore
-dotnet build
-dotnet run --project BooksReviews.Api
-```
+Puedes levantar toda la aplicación (API, base de datos y frontend) usando Docker y Docker Compose. Asegúrate de tener [Docker](https://docs.docker.com/get-docker/) y [Docker Compose](https://docs.docker.com/compose/install/) instalados.
 
-Verifique `appsettings.json` o variables de entorno para `JwtSettings` y la cadena de conexión a la base de datos.
+### 1. Levantar todos los servicios
 
-2) Frontend (Angular)
+Desde la raíz del proyecto, ejecuta:
 
 ```bash
-cd FrontBooksReviews
-npm install
-npm run dev
+docker compose up --build
 ```
 
-La API expone OpenAPI/Swagger en entorno de desarrollo (configurado en [BooksReviews.Api/Program.cs](BooksReviews.Api/Program.cs#L1)).
+Esto levantará tres servicios:
+- **db**: SQL Server (persistencia en volumen local)
+- **api**: Backend ASP.NET Core (puerto 5000)
+- **frontend**: Angular (puerto 3000)
 
-3) Tests
+La primera vez puede tardar varios minutos por la descarga de imágenes y la construcción.
+
+### 2. Acceso a la aplicación
+
+- **Frontend Angular:** [http://localhost:3000](http://localhost:3000)
+- **API Swagger/OpenAPI:** [http://localhost:5000/swagger](http://localhost:5000/swagger)
+- **Base de datos:** SQL Server expuesto en `localhost:1433` (usuario: `sa`, contraseña: `YourStrong@Passw0rd`)
+
+### 3. Variables y configuración
+
+- La cadena de conexión y los secretos están definidos en `compose.yml` como variables de entorno.
+- Puedes modificar la contraseña de SQL Server y otros valores en el archivo `compose.override.yml` para personalizar tu entorno local.
+- El frontend se comunica con la API usando la variable `API_URL` definida en el servicio `frontend`.
+
+### 4. Parar y limpiar los contenedores
+
+Para detener los servicios y limpiar los recursos:
 
 ```bash
-cd BooksReviews.UnitTests
-dotnet test
+docker compose down -v
 ```
+
+Esto elimina los contenedores y el volumen de la base de datos.
+
+---
 
 **Notas y recomendaciones rápidas:**
 - Revisa `BooksReviews.Infrastructure/Persistence/ApplicationDbContext.cs` para esquemas y migraciones de EF Core.
 - Las clases de autenticación están en [BooksReviews.Infrastructure/Authentication](BooksReviews.Infrastructure/Authentication).
-- Para producción, ajuste `JwtSettings` y la cadena de conexión (secretos en variables de entorno o un vault).
+- Para producción, ajusta `JwtSettings` y la cadena de conexión (secretos en variables de entorno o un vault).

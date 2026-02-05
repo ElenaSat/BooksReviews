@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+*.md
+
+# Build artifacts
+**/bin/
+**/obj/
+**/dist/
+**/node_modules/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Tests
+**/*Tests/
+**/*.Tests/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

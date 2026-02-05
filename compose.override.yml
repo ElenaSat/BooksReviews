@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      target: build
+    volumes:
+      - ./BooksReviews.Api:/src/BooksReviews.Api
+      - ./BooksReviews.Application:/src/BooksReviews.Application
+      - ./BooksReviews.Domain:/src/BooksReviews.Domain
+      - ./BooksReviews.Infrastructure:/src/BooksReviews.Infrastructure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    command: dotnet watch run --project /src/BooksReviews.Api/BooksReviews.Api.csproj --no-restore
+
+  frontend:
+    build:
+      target: build
+    volumes:
+      - ./FrontBooksReviews:/app
+      - /app/node_modules
+    command: npm run dev
+    ports:
+      - "3000:3000"
