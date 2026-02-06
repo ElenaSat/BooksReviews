@@ -9,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = environment.apiBaseUrl + '/Users';
+  private apiUrl = environment.apiUrl + '/Users';
 
   // Signal to hold the current authenticated user
   private _currentUser = signal<User | null>(null);
@@ -55,15 +55,15 @@ export class AuthService {
       avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`
     };
 
-   try {
-          await lastValueFrom(this.http.post(this.apiUrl, registerData,{
-        responseType: 'text'  
+    try {
+      await lastValueFrom(this.http.post(this.apiUrl, registerData, {
+        responseType: 'text'
       }));
       return true;
     } catch (error) {
       console.error('Registration failed:', error);
-    return false;
-  }
+      return false;
+    }
   }
 
   logout() {

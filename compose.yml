@@ -10,6 +10,7 @@ services:
       - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - booksreviews-network
     healthcheck:
@@ -17,7 +18,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
-      start_period: 10s
+      start_period: 60s
 
   api:
     build:
@@ -25,11 +26,11 @@ services:
       dockerfile: Dockerfile
     container_name: booksreviews-api
     ports:
-      - "5000:8080"
+      - "7151:5216"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Server=db;Database=BooksReviews;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5216
+      - ConnectionStrings__DefaultConnection=Server=db;Database=BooksReviewsDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
     depends_on:
       db:
         condition: service_healthy
@@ -43,9 +44,9 @@ services:
       dockerfile: Dockerfile
     container_name: booksreviews-frontend
     ports:
-      - "3000:8080"
+      - "3000:3000"
     environment:
-      - API_URL=http://api:8080
+      - API_URL=http://api:5216
     depends_on:
       - api
     networks:

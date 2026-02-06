@@ -57,7 +57,7 @@ docker compose up --build
 
 Esto levantará tres servicios:
 - **db**: SQL Server (persistencia en volumen local)
-- **api**: Backend ASP.NET Core (puerto 5000)
+- **api**: Backend ASP.NET Core (puerto 5216)
 - **frontend**: Angular (puerto 3000)
 
 La primera vez puede tardar varios minutos por la descarga de imágenes y la construcción.
@@ -65,7 +65,7 @@ La primera vez puede tardar varios minutos por la descarga de imágenes y la con
 ### 2. Acceso a la aplicación
 
 - **Frontend Angular:** [http://localhost:3000](http://localhost:3000)
-- **API Swagger/OpenAPI:** [http://localhost:5000/swagger](http://localhost:5000/swagger)
+- **API Swagger/OpenAPI:** [http://localhost:5216/swagger](http://localhost:5216/swagger)
 - **Base de datos:** SQL Server expuesto en `localhost:1433` (usuario: `sa`, contraseña: `YourStrong@Passw0rd`)
 
 ### 3. Variables y configuración

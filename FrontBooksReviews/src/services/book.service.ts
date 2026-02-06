@@ -9,7 +9,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class BookService {
   private http = inject(HttpClient);
-  private apiUrl = environment.apiBaseUrl;
+  private apiUrl = environment.apiUrl;
 
   // State managed by signals
   private _books = signal<Book[]>([]);
@@ -68,18 +68,18 @@ export class BookService {
   async addReview(bookId: string, userId: string, userName: string, rating: number, comment: string) {
     const command = {
       id: 'r-' + Math.floor(Math.random() * 10000).toString(),
-      bookId:bookId,
-      userId:userId,
+      bookId: bookId,
+      userId: userId,
       userName: userName,
-      rating:rating,
-      comment:comment
+      rating: rating,
+      comment: comment
     };
 
     try {
-      await lastValueFrom(this.http.post(`${this.apiUrl}/Reviews`, command,{
-        responseType: 'text'  
+      await lastValueFrom(this.http.post(`${this.apiUrl}/Reviews`, command, {
+        responseType: 'text'
       }));
-      
+
       // Refresh reviews and book rating
       await this.loadReviewsForBook(bookId);
       await this.loadBooks();
